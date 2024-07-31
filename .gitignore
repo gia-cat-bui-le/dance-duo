@@ -263,3 +263,6 @@ fabric.properties
 # project result
 server/vid_demo/
 server/dance_data/romp/
+
+#not script in unity
+!demo_application/Assets/Scripts/

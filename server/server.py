@@ -14,6 +14,8 @@ import time
 import subprocess
 import json
 
+# from scoring.scoring import calculate_score
+
 # Create UDP socket to use for sending (and receiving)
 sock = U.UdpComms(udpIP="127.0.0.1", portTX=8000, portRX=8001, enableRX=True, suppressWarnings=True)
 
@@ -34,16 +36,20 @@ while True:
     data_dict = json.loads(data)
     if "video" in data_dict:
         video_path = data_dict['video']
+        genre = data_dict['genre']
 
-        # subprocess.run(
-        #     ['python', './romp/main.py', f"--mode={MODE}", CALC_SMPL, RENDER_MESH, f"--frame_rate={FRAME_RATE}",
-        #      f"-i={video_path}", f"-o={output_path}", SAVE_VIDEO])
-        # print("done render vid")
+        # time.sleep(2)
+        subprocess.run(
+            ['python', './romp/main.py', f"--mode={MODE}", CALC_SMPL, RENDER_MESH, f"--frame_rate={FRAME_RATE}",
+             f"-i={video_path}", f"-o={output_path}", SAVE_VIDEO])
+        print("done render vid")
+        score = calculate_score(genre)
         result = {
-            'video': os.path.abspath(output_path)
+            'video': os.path.abspath(output_path),
+            'score': str(score),
         }
 
-        time.sleep(5)
+        # time.sleep(5)
         print(json.dumps(result))
 
         # Send this string to other application
