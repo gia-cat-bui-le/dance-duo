@@ -13,8 +13,8 @@ import UdpComms as U
 import time
 import subprocess
 import json
-
-# from scoring.scoring import calculate_score
+from scoring.scoring import calculate_score
+import numpy as np
 
 # Create UDP socket to use for sending (and receiving)
 sock = U.UdpComms(udpIP="127.0.0.1", portTX=8000, portRX=8001, enableRX=True, suppressWarnings=True)
@@ -27,38 +27,58 @@ RENDER_MESH = "--render_mesh"
 FRAME_RATE = 30
 SAVE_VIDEO = "--save_video"
 output_path = "vid_demo/output/test.mp4"
+SHOW_LARGETS = "--show_largest"
 
-while True:
-    data = sock.ReadReceivedData()
-    print(f"data: {data}")
-    if data is None:
-        continue
-    data_dict = json.loads(data)
-    if "video" in data_dict:
-        video_path = data_dict['video']
-        genre = data_dict['genre']
+# while True:
+#     data = sock.ReadReceivedData()
+#     print(f"data: {data}")
+#     if data is None:
+#         continue
+#     data_dict = json.loads(data)
+#     if "video" in data_dict:
+#         video_path = data_dict['video']
+#         genre = data_dict['genre']
+#
+#         # time.sleep(2)
+#         subprocess.run(
+#             ['python', './romp/main.py', f"--mode={MODE}", CALC_SMPL, RENDER_MESH, f"--frame_rate={FRAME_RATE}",
+#              f"-i={video_path}", f"-o={output_path}", SAVE_VIDEO])
+#         print("done render vid")
+#         score = calculate_score(genre)
+#         result = {
+#             'video': os.path.abspath(output_path),
+#             'score': str(score),
+#         }
+#
+#         # time.sleep(5)
+#         print(json.dumps(result))
+#
+#         # Send this string to other application
+#         sock.SendData(json.dumps(result))
+#     # i += 1
+#     #
+#     # data = sock.ReadReceivedData() # read data
+#     #
+#     # if data != None: # if NEW data has been received since last ReadReceivedData function call
+#     #     print(data) # print new received data
+#     #
+#     time.sleep(1)
 
-        # time.sleep(2)
-        subprocess.run(
-            ['python', './romp/main.py', f"--mode={MODE}", CALC_SMPL, RENDER_MESH, f"--frame_rate={FRAME_RATE}",
-             f"-i={video_path}", f"-o={output_path}", SAVE_VIDEO])
-        print("done render vid")
-        score = calculate_score(genre)
-        result = {
-            'video': os.path.abspath(output_path),
-            'score': str(score),
-        }
+video_path = "C:/KHTN\Thesis/visualize\demo_application\dhms-demo-application\demo_application\Assets\Videos/break_f.mp4"
+genre = "hiphop"
+#
+subprocess.run(
+    ['python', './romp/main.py', f"--mode={MODE}", CALC_SMPL, RENDER_MESH, f"--frame_rate={FRAME_RATE}",
+     f"-i={video_path}", f"-o={output_path}", SAVE_VIDEO, SHOW_LARGETS])
+print("done render vid")
+score = calculate_score(genre)
+result = {
+    'video': os.path.abspath(output_path),
+    'score': str(score),
+}
 
-        # time.sleep(5)
-        print(json.dumps(result))
+# time.sleep(5)
+print(json.dumps(result))
 
-        # Send this string to other application
-        sock.SendData(json.dumps(result))
-    # i += 1
-    #
-    # data = sock.ReadReceivedData() # read data
-    #
-    # if data != None: # if NEW data has been received since last ReadReceivedData function call
-    #     print(data) # print new received data
-    #
-    time.sleep(1)
+with open("result.txt", "w") as f:
+    f.write(json.dumps(result))

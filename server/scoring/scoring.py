@@ -6,8 +6,8 @@ import smplx
 import torch
 from scipy.spatial.transform import Rotation as R
 
-ALPHA = 7
-BETA = 3
+ALPHA = 2.5
+BETA = 1
 
 
 def romp2edge_smpl(romp_data):
@@ -106,13 +106,13 @@ def mpjae(frame, capture_data, reference_data):
     for i in range(0, num_joints):
         generated_rot = generated_pose[i:i + 3]
         capture_rot = capture_pose[0][i:i + 3]
-        print(f"gen: {generated_rot}, cap: {capture_rot}")
+        # print(f"gen: {generated_rot}, cap: {capture_rot}")
         generated_rot = get_euclidean_rot(generated_pose[i:i + 3])
         capture_rot = get_euclidean_rot(capture_pose[0][i:i + 3])
         generated_rot_u = unit_vector(generated_rot)
         capture_rot_u = unit_vector(capture_rot)
         error = np.arccos(np.clip(np.dot(generated_rot_u, capture_rot_u), -1.0, 1.0)) / 2.0 / np.pi
-        print(f"rot error joint {i}: {error}")
+        # print(f"rot error joint {i}: {error}")
         total_error += error
 
     return total_error / num_joints
@@ -141,9 +141,12 @@ def calculate_score(music_genre):
         # print(type(capture_result_data))
         capture_data = capture_result_data[cur_frame]
         capture_data = romp2edge_smpl(capture_data)
-        pose_error = 1 - mpjpe(f, capture_data, generated_dance)
-        angle_error = 1 - mpjae(f, capture_data, generated_dance)
-        accuracy = (pose_error + angle_error) / 2
-        total_point += accuracy_to_score(accuracy)
+        pose_error = mpjpe(f, capture_data, generated_dance)
+        angle_error = mpjae(f, capture_data, generated_dance)
+        error = (pose_error + angle_error) / 2
+        accuracy = 1 - error
+        score = accuracy_to_score(accuracy)
+        print(f"frame {f}:\n\taccuracy: {accuracy}\n\tscore: {score}")
+        total_point += score
 
     return round(total_point * 100 / num_generated_frames, 2)

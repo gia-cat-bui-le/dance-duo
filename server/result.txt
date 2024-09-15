@@ -1,0 +1,1 @@
+{"video": "C:\\KHTN\\Thesis\\visualize\\demo_application\\dhms-demo-application\\server\\vid_demo\\output\\test.mp4", "score": "83.82"}
